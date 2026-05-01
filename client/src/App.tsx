@@ -1,11 +1,24 @@
-import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import SignIn from "./pages/SignIn";
+import SignOut from "./pages/SignOut";
+import Profile from "./pages/Profile";
+import Header from "./assets/components/Header";
 
-export default function App() {
+import type { JSX } from "react";
+
+export default function App(): JSX.Element {
   return (
-    <body>
-      <h1 className="text-3xl font-bold underline text-amber-600">
-        Hello world!
-      </h1>
-    </body>
+    <BrowserRouter>
+      <Header />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/signin" element={<SignIn />} />
+        <Route path="/signout" element={<SignOut />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
