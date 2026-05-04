@@ -3,6 +3,7 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import SignUp from "./pages/SignUp";
 import SignOut from "./pages/SignOut";
+import SignIn from "./pages/SignIn";
 import Profile from "./pages/Profile";
 import Header from "./assets/components/Header";
 
@@ -17,6 +18,7 @@ export default function App(): JSX.Element {
         <Route path="/about" element={<About />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/signup" element={<SignUp />} />
+        <Route path="/signin" element={<SignIn />} />
         <Route path="/signout" element={<SignOut />} />
       </Routes>
     </BrowserRouter>
