@@ -6,8 +6,8 @@ import SignOut from "./pages/SignOut";
 import SignIn from "./pages/SignIn";
 import Profile from "./pages/Profile";
 import Header from "./assets/components/Header";
-
 import type { JSX } from "react";
+import PrivateRoute from "./assets/PrivateRoute";
 
 export default function App(): JSX.Element {
   return (
@@ -16,10 +16,12 @@ export default function App(): JSX.Element {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signout" element={<SignOut />} />
+        <Route element={<PrivateRoute />}>
+          <Route path="/profile" element={<Profile />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );
