@@ -8,15 +8,23 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
+import {
+  updateUserStart,
+  updateUserSuccess,
+  updateUserFailure,
+} from "../redux/user/userSlice.js";
+import { useDispatch } from "react-redux";
 
 export default function Profile(): JSX.Element {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser, loading, error } = useSelector((state) => state.user);
   const fileRef = useRef(null);
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
   const [formData, setFormData] = useState({});
-  console.log(filePerc);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const dispatch = useDispatch();
+
   // firebase storage rules
   // allow read;
   // allow write: if
@@ -47,6 +55,35 @@ export default function Profile(): JSX.Element {
       },
     );
   };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      dispatch(updateUserStart());
+      const res = await fetch(`/api/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setUpdateSuccess(false);
+        dispatch(updateUserFailure(data.message));
+        return;
+      }
+      setUpdateSuccess(true);
+      dispatch(updateUserSuccess(data));
+    } catch (error) {
+      setUpdateSuccess(false);
+      dispatch(updateUserFailure(error.message));
+    }
+  };
   useEffect(() => {
     if (file) {
       handleFileUpload(file);
@@ -55,7 +92,7 @@ export default function Profile(): JSX.Element {
   return (
     <div className="p-3 max-w-lg mx-auto">
       <h1 className="text-3xl font-semibold text-center my-7">Profile</h1>
-      <form className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           type="file"
@@ -86,30 +123,42 @@ export default function Profile(): JSX.Element {
           id="username"
           type="text"
           placeholder="username"
+          defaultValue={currentUser.username}
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           id="email"
           type="text"
           placeholder="email"
+          defaultValue={currentUser.email}
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
         <input
           id="password"
           type="password"
           placeholder="password"
           className="border p-3 rounded-lg"
+          onChange={handleChange}
         />
-        <button className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-70">
-          Update
+        <button
+          disabled={loading}
+          className=" bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-70 shadow-lg active:shadow-none active:translate-y-1 transition-all"
+        >
+          {loading ? "Loading" : "Update"}
         </button>
-        <button className="bg-green-800 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-70">
+        <button className="bg-green-800 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-70 shadow-lg active:shadow-none active:translate-y-1 transition-all">
           Create Listing
         </button>
       </form>
       <div className="flex justify-between mt-5">
         <span className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign Out</span>
+      </div>
+      <div className="text-red-700 mt-5">{error ? error : ""}</div>
+      <div className="text-green-700">
+        {updateSuccess ? " User updated successfully" : ""}
       </div>
     </div>
   );
