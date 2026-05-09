@@ -8,6 +8,7 @@ import Profile from "./pages/Profile";
 import Header from "./assets/components/Header";
 import type { JSX } from "react";
 import PrivateRoute from "./assets/PrivateRoute";
+import CreateListing from "./pages/CreateListing";
 
 export default function App(): JSX.Element {
   return (
@@ -19,8 +20,10 @@ export default function App(): JSX.Element {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signout" element={<SignOut />} />
+
         <Route element={<PrivateRoute />}>
           <Route path="/profile" element={<Profile />} />
+          <Route path="/create-listing" element={<CreateListing />} />
         </Route>
       </Routes>
     </BrowserRouter>

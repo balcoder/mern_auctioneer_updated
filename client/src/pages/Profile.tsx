@@ -1,6 +1,7 @@
 import type { JSX } from "react";
 import { app } from "../firebase.js";
 import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import {
   getDownloadURL,
@@ -185,9 +186,12 @@ export default function Profile(): JSX.Element {
         >
           {loading ? "Loading" : "Update"}
         </button>
-        <button className="bg-green-800 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-70 shadow-lg active:shadow-none active:translate-y-1 transition-all">
+        <Link
+          className="bg-green-800 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-70 shadow-lg active:shadow-none active:translate-y-1 transition-all"
+          to={"/create-listing"}
+        >
           Create Listing
-        </button>
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
         <span
