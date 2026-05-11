@@ -1,14 +1,13 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import useReducer from "./user/userSlice";
 import { persistReducer, persistStore } from "redux-persist";
-// import storage from "redux-persist/lib/storage";
 
 // Safe storage that works well with Vite
 import createWebStorage from "redux-persist/es/storage/createWebStorage";
 
 const createNoopStorage = () => ({
   getItem: () => Promise.resolve(null),
-  setItem: (_key, value) => Promise.resolve(value),
+  setItem: (_key: string, value: string) => Promise.resolve(value),
   removeItem: () => Promise.resolve(),
 });
 

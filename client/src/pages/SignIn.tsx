@@ -7,26 +7,27 @@ import {
   signInFailure,
 } from "../redux/user/userSlice";
 import OAuth from "../assets/components/OAuth.tsx";
+import type { RootState } from "../redux/store.ts";
+import type { SubmitEventHandler } from "react";
 
 export default function SignIn() {
   const [formData, setFormData] = useState({});
   // const [error, setError] = useState(null);
   // const [loading, setLoading] = useState(false);
-  const { loading, error } = useSelector((state) => state.user);
+  const { loading, error } = useSelector((state: RootState) => state.user);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const handleChange = (e) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
       [e.target.id]: e.target.value,
     });
   };
-  const handleSubmit = async (e) => {
+  const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault();
     try {
-      // setLoading(true);
       dispatch(signInStart());
       const res = await fetch("/api/auth/signin", {
         method: "POST",
@@ -38,20 +39,17 @@ export default function SignIn() {
       const data = await res.json();
       // if error middleware in index.js send json with success false
       if (data.success === false) {
-        // setError(data.message);
-        // setLoading(false);
         dispatch(signInFailure(data.message));
         return;
       }
-      // setLoading(false);
-      // setError(null);
       dispatch(signInSuccess(data));
       navigate("/");
-      console.log(data);
     } catch (error) {
-      // setLoading(false);
-      // setError(error.message);
-      dispatch(signInFailure(error.message));
+      if (error instanceof Error) {
+        dispatch(signInFailure(error.message));
+      } else {
+        dispatch(signInFailure("An unknown error occured during signin"));
+      }
     }
   };
 

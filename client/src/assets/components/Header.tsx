@@ -2,9 +2,10 @@ import type { JSX } from "react";
 import { Link } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { useSelector } from "react-redux";
+import type { RootState } from "../../redux/store.ts";
 
 export default function Header(): JSX.Element {
-  const { currentUser } = useSelector((state) => state.user);
+  const { currentUser } = useSelector((state: RootState) => state.user);
   return (
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
@@ -40,6 +41,7 @@ export default function Header(): JSX.Element {
                 className="rounded-full w-10 h-10 object-cover"
                 src={currentUser.avatar}
                 alt="avatar"
+                referrerPolicy="no-referrer"
               />
             ) : (
               <li className="text-slate-700 hover:underline">Sign in</li>
