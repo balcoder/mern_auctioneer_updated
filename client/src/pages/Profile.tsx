@@ -132,6 +132,16 @@ export default function Profile(): JSX.Element {
       }
     }
   };
+
+  const handleShowListings = async () => {
+    // try {
+    //   const res = await fetch(`/api/user/listings/${currentUser._id}`);
+    //   const data = await res.json();
+    //   if(data.success === false) {
+    //   }
+    // } catch (error) {
+    // }
+  };
   useEffect(() => {
     const handleFileUpload = (file: File) => {
       const storage = getStorage(app);
@@ -239,6 +249,12 @@ export default function Profile(): JSX.Element {
         <span onClick={handleSignOut} className="text-red-700 cursor-pointer">
           Sign Out
         </span>
+      </div>
+      <div
+        onClick={handleShowListings}
+        className="text-green-700 flex justify-center mt-4"
+      >
+        Show Listings
       </div>
       <div className="text-red-700 mt-5">{error ? error : ""}</div>
       <div className="text-green-700">
