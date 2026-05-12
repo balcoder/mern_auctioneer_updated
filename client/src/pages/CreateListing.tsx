@@ -7,6 +7,9 @@ import {
   uploadBytesResumable,
 } from "firebase/storage";
 import type { SubmitEventHandler } from "react";
+import type { RootState } from "../redux/store.ts";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 interface FormData {
   imageUrls: string[];
@@ -24,6 +27,7 @@ interface FormData {
 }
 
 export default function CreateListing() {
+  const { currentUser } = useSelector((state: RootState) => state.user);
   const [files, setFiles] = useState<FileList | null>(null);
   const [formData, setFormData] = useState<FormData>({
     imageUrls: [],
@@ -34,7 +38,7 @@ export default function CreateListing() {
     bedrooms: 1,
     bathrooms: 1,
     regularPrice: 100,
-    discountPrice: 100,
+    discountPrice: 0,
     offer: false,
     parking: false,
     furnished: false,
@@ -43,6 +47,7 @@ export default function CreateListing() {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const storeImage = async (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -72,6 +77,7 @@ export default function CreateListing() {
   };
 
   const handleImageSubmit = () => {
+    console.log(files);
     if (
       files &&
       files.length > 0 &&
@@ -97,8 +103,13 @@ export default function CreateListing() {
           setImgUploadError("Image upload failed (2mb max per image)");
         });
     } else {
-      setImgUploadError("You can only upload 6 images per listing");
-      setUploading(false);
+      if (files === null) {
+        setImgUploadError("You need at least one images per listing");
+        setUploading(false);
+      } else {
+        setImgUploadError("You can only upload 6 images per listing");
+        setUploading(false);
+      }
     }
   };
 
@@ -145,22 +156,30 @@ export default function CreateListing() {
   };
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
+    // Guard clause: If there's no user, don't even try the fetch
+    if (!currentUser) return;
+
     e.preventDefault();
     try {
+      if (formData.imageUrls.length < 1)
+        return setError("You must upload at least one image");
+      if (formData.regularPrice < formData.discountPrice)
+        return setError("Discount price must be lower than regular price");
       setLoading(true);
       setError("");
-      const res = await fetch("/api/listing/create", {
+      const res = await fetch(`/api/listing/create/${currentUser._id}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({ ...formData, userRef: currentUser._id }),
       });
       const data = await res.json();
       setLoading(false);
       if (data.success === false) {
         setError(data.message);
       }
+      navigate(`/listing/${data._id}`);
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -195,7 +214,7 @@ export default function CreateListing() {
           <textarea
             onChange={handleChange}
             value={formData.description}
-            placeholder="description"
+            placeholder="Description"
             id="description"
             name="description"
             required
@@ -206,7 +225,7 @@ export default function CreateListing() {
             value={formData.address}
             id="address"
             type="text"
-            placeholder="address"
+            placeholder="Address"
             required
             className="bg-white p-3 rounded-lg border border-slate-300"
           />
@@ -306,22 +325,25 @@ export default function CreateListing() {
                 <span className="text-xs">($/Month)</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="number"
-                id="discountPrice"
-                min="100"
-                max="10000000"
-                required
-                className="bg-white border border-gray-300 rounded-lg p-2"
-                onChange={handleChange}
-                value={formData.discountPrice}
-              />
-              <div className="flex flex-col items-center">
-                <p>Discounted Price</p>
-                <span className="text-xs">($/Month)</span>
+
+            {formData.offer && (
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  id="discountPrice"
+                  min="0"
+                  max="10000000"
+                  required
+                  className="bg-white border border-gray-300 rounded-lg p-2"
+                  onChange={handleChange}
+                  value={formData.discountPrice}
+                />
+                <div className="flex flex-col items-center">
+                  <p>Discounted Price</p>
+                  <span className="text-xs">($/Month)</span>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
@@ -372,7 +394,10 @@ export default function CreateListing() {
                 </button>
               </div>
             ))}
-          <button className="rounded-lg bg-slate-700 text-white p-3 uppercase hover:opacity-95 disabled:opacity-80">
+          <button
+            disabled={loading || uploading}
+            className="rounded-lg bg-slate-700 text-white p-3 uppercase hover:opacity-95 disabled:opacity-80"
+          >
             {loading ? "Creating..." : "Create Listing"}
           </button>
           {error && <p className="text-red-700 text-sm">{error}</p>}
