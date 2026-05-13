@@ -67,6 +67,7 @@ export default function Profile(): JSX.Element {
   const [userListings, setUserListings] = useState<UserListing[]>([]);
   const [showListingError, setShowListingError] = useState(false);
   const [showDeleteListingError, setShowDeleteListingError] = useState(false);
+  const [showUpdateListingError, setShowUpdateListingError] = useState(false);
   const dispatch = useDispatch();
 
   // firebase storage rules
@@ -196,6 +197,29 @@ export default function Profile(): JSX.Element {
       }
     }
   };
+
+  // const handleUpdateListing = async (listingId: string) => {
+  //   try {
+  //     setShowUpdateListingError(false);
+  //     const res = await fetch(`/api/listing/update/${listingId}`, {
+  //       method: "DELETE",
+  //     });
+  //     const data = await res.json();
+  //     if (data.success === false) {
+  //       setShowUpdateListingError(true);
+  //       return;
+  //     }
+  //     // successful delete so update listings
+  //     setUserListings((prev) =>
+  //       prev.filter((listing) => listing._id !== listingId),
+  //     );
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       console.log(error.message);
+  //       setShowUpdateListingError(true);
+  //     }
+  //   }
+  // };
   useEffect(() => {
     const handleFileUpload = (file: File) => {
       const storage = getStorage(app);
@@ -320,6 +344,7 @@ export default function Profile(): JSX.Element {
           Your Listings
         </h1>
         <p>{showDeleteListingError ? "Error deleting listing" : ""}</p>
+        <p>{showUpdateListingError ? "Error deleting listing" : ""}</p>
         {userListings &&
           userListings.length > 0 &&
           userListings.map((listing) => (
@@ -347,7 +372,9 @@ export default function Profile(): JSX.Element {
                 >
                   Delete
                 </button>
-                <button className="text-green-700 uppercase">Edit</button>
+                <Link to={`/update-listing/${listing._id}`}>
+                  <button className="text-green-700 uppercase">Edit</button>
+                </Link>
               </div>
             </div>
           ))}
