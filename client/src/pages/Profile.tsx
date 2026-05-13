@@ -66,6 +66,7 @@ export default function Profile(): JSX.Element {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [userListings, setUserListings] = useState<UserListing[]>([]);
   const [showListingError, setShowListingError] = useState(false);
+  const [showDeleteListingError, setShowDeleteListingError] = useState(false);
   const dispatch = useDispatch();
 
   // firebase storage rules
@@ -169,6 +170,29 @@ export default function Profile(): JSX.Element {
       if (error instanceof Error) {
         console.log(error.message);
         setShowListingError(true);
+      }
+    }
+  };
+
+  const handleDeleteListing = async (listingId: string) => {
+    try {
+      setShowDeleteListingError(false);
+      const res = await fetch(`/api/listing/delete/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        setShowDeleteListingError(true);
+        return;
+      }
+      // successful delete so update listings
+      setUserListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId),
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        console.log(error.message);
+        setShowDeleteListingError(true);
       }
     }
   };
@@ -295,6 +319,7 @@ export default function Profile(): JSX.Element {
         <h1 className="text-center mt-7 text-2xl font-semibold">
           Your Listings
         </h1>
+        <p>{showDeleteListingError ? "Error deleting listing" : ""}</p>
         {userListings &&
           userListings.length > 0 &&
           userListings.map((listing) => (
@@ -316,7 +341,12 @@ export default function Profile(): JSX.Element {
                 <p>{listing.name}</p>
               </Link>
               <div className="flex flex-col">
-                <button className="text-red-700 uppercase">Delete</button>
+                <button
+                  onClick={() => handleDeleteListing(listing._id)}
+                  className="text-red-700 uppercase"
+                >
+                  Delete
+                </button>
                 <button className="text-green-700 uppercase">Edit</button>
               </div>
             </div>
