@@ -58,13 +58,15 @@ export default function CreateListing() {
       const res = await fetch(`/api/listing/get/${listingId}`);
       const data = await res.json();
       if (data.success === false) {
-        console.log(data.message);
+        setError(data.message);
+        return;
       }
+      console.log(data);
       setFormData(data);
     };
 
     fetchListing();
-  }, []);
+  }, [params.listingId]);
 
   // store image function for google firebase
   const storeImage = async (file: File): Promise<string> => {
@@ -137,40 +139,78 @@ export default function CreateListing() {
       imageUrls: formData.imageUrls.filter((_, i) => i !== index),
     });
   };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     // Use type narrowing to safely access 'checked'
-    const isCheckbox =
-      e.target instanceof HTMLInputElement && e.target.type === "checkbox";
-    if (e.target.id === "sale" || e.target.id === "rent") {
-      setFormData({
-        ...formData,
-        type: e.target.id,
-      });
+    // const isCheckbox =
+    //   e.target instanceof HTMLInputElement && e.target.type === "checkbox";
+    // if (e.target.id === "sale" || e.target.id === "rent") {
+    //   setFormData({
+    //     ...formData,
+    //     type: e.target.id,
+    //   });
+    // }
+    // if (
+    //   e.target.id === "parking" ||
+    //   e.target.id === "furnished" ||
+    //   e.target.id === "offer"
+    // ) {
+    //   setFormData({
+    //     ...formData,
+    //     [e.target.id]: isCheckbox
+    //       ? (e.target as HTMLInputElement).checked
+    //       : e.target.value,
+    //   });
+    // }
+    // if (
+    //   e.target.type === "number" ||
+    //   e.target.type === "text" ||
+    //   e.target.type === "textarea"
+    // ) {
+    //   setFormData({
+    //     ...formData,
+    //     [e.target.id]: e.target.value,
+    //   });
+    // }
+    const { id, type, value } = e.target;
+
+    // 1. Handle Radio / Type Toggles (sale or rent)
+    if (id === "sale" || id === "rent") {
+      setFormData((prev) => ({
+        ...prev,
+        type: id,
+      }));
+      return; // Exit early
     }
-    if (
-      e.target.id === "parking" ||
-      e.target.id === "furnished" ||
-      e.target.id === "offer"
-    ) {
-      setFormData({
-        ...formData,
-        [e.target.id]: isCheckbox
-          ? (e.target as HTMLInputElement).checked
-          : e.target.value,
-      });
+
+    // 2. Handle Checkboxes safely
+    if (type === "checkbox") {
+      // Create a type-safe reference to the input element
+      const checkboxTarget = e.target as HTMLInputElement;
+
+      setFormData((prev) => ({
+        ...prev,
+        [id]: checkboxTarget.checked,
+      }));
+      return;
     }
-    if (
-      e.target.type === "number" ||
-      e.target.type === "text" ||
-      e.target.type === "textarea"
-    ) {
-      setFormData({
-        ...formData,
-        [e.target.id]: e.target.value,
-      });
+
+    // 3. Handle Numbers safely (convert string to number)
+    if (type === "number") {
+      setFormData((prev) => ({
+        ...prev,
+        [id]: value === "" ? "" : Number(value),
+      }));
+      return; // Exit early
     }
+
+    // 4. Fallback for all text, textarea, and other text-like inputs
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
   };
 
   const handleSubmit: SubmitEventHandler<HTMLFormElement> = async (e) => {
@@ -196,8 +236,9 @@ export default function CreateListing() {
       setLoading(false);
       if (data.success === false) {
         setError(data.message);
+        return;
       }
-      navigate(`/listing/${data._id}`);
+      navigate(`/listing/${params.listingId}`);
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
@@ -220,7 +261,7 @@ export default function CreateListing() {
         <div className="flex flex-col gap-4 flex-1">
           <input
             onChange={handleChange}
-            value={formData.name}
+            value={formData.name || ""}
             id="name"
             type="text"
             placeholder="Name"
@@ -231,7 +272,7 @@ export default function CreateListing() {
           />
           <textarea
             onChange={handleChange}
-            value={formData.description}
+            value={formData.description || ""}
             placeholder="Description"
             id="description"
             name="description"
@@ -240,7 +281,7 @@ export default function CreateListing() {
           />
           <input
             onChange={handleChange}
-            value={formData.address}
+            value={formData.address || ""}
             id="address"
             type="text"
             placeholder="Address"
