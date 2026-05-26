@@ -25,7 +25,7 @@ import type { RootState } from "../redux/store.ts";
 import type { SubmitEventHandler } from "react";
 import type { UserState } from "../redux/user/userSlice.ts";
 
-interface ProfileFormData {
+export interface ProfileFormData {
   username?: string;
   email?: string;
   password?: string;
@@ -317,9 +317,11 @@ export default function Profile(): JSX.Element {
       </button>
       <p>{showListingError ? "Error showing listings" : ""}</p>
       <div className="flex flex-col gap-4">
-        <h1 className="text-center mt-7 text-2xl font-semibold">
-          Your Listings
-        </h1>
+        {userListings && userListings.length > 0 && (
+          <h1 className="text-center mt-7 text-2xl font-semibold">
+            Your Listings
+          </h1>
+        )}
         <p>{showDeleteListingError ? "Error deleting listing" : ""}</p>
         {userListings &&
           userListings.length > 0 &&

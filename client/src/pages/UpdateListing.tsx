@@ -61,7 +61,7 @@ export default function CreateListing() {
         setError(data.message);
         return;
       }
-      console.log(data);
+
       setFormData(data);
     };
 
@@ -143,37 +143,6 @@ export default function CreateListing() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    // Use type narrowing to safely access 'checked'
-    // const isCheckbox =
-    //   e.target instanceof HTMLInputElement && e.target.type === "checkbox";
-    // if (e.target.id === "sale" || e.target.id === "rent") {
-    //   setFormData({
-    //     ...formData,
-    //     type: e.target.id,
-    //   });
-    // }
-    // if (
-    //   e.target.id === "parking" ||
-    //   e.target.id === "furnished" ||
-    //   e.target.id === "offer"
-    // ) {
-    //   setFormData({
-    //     ...formData,
-    //     [e.target.id]: isCheckbox
-    //       ? (e.target as HTMLInputElement).checked
-    //       : e.target.value,
-    //   });
-    // }
-    // if (
-    //   e.target.type === "number" ||
-    //   e.target.type === "text" ||
-    //   e.target.type === "textarea"
-    // ) {
-    //   setFormData({
-    //     ...formData,
-    //     [e.target.id]: e.target.value,
-    //   });
-    // }
     const { id, type, value } = e.target;
 
     // 1. Handle Radio / Type Toggles (sale or rent)
@@ -185,7 +154,7 @@ export default function CreateListing() {
       return; // Exit early
     }
 
-    // 2. Handle Checkboxes safely
+    // 2. Handle Checkboxes
     if (type === "checkbox") {
       // Create a type-safe reference to the input element
       const checkboxTarget = e.target as HTMLInputElement;
@@ -197,7 +166,7 @@ export default function CreateListing() {
       return;
     }
 
-    // 3. Handle Numbers safely (convert string to number)
+    // 3. Handle Numbers (convert string to number)
     if (type === "number") {
       setFormData((prev) => ({
         ...prev,

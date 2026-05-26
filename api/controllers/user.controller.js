@@ -3,10 +3,6 @@ import Listing from "../models/listing.modle.js";
 import { errorHandler } from "../utils/error.js";
 import bcryptjs from "bcryptjs";
 
-export const test = (req, res) => {
-  res.json({ message: "Hello from user.controller" });
-};
-
 export const updateUser = async (req, res, next) => {
   // req.user.id comes from the cookie
   if (req.user.id !== req.params.id)
@@ -53,6 +49,18 @@ export const getUserListing = async (req, res, next) => {
   try {
     const listings = await Listing.find({ userRef: req.user.id });
     res.status(200).json(listings);
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return next(errorHandler(404, "User not found!"));
+
+    const { password: pass, ...rest } = user._doc;
+    res.status(200).json(rest);
   } catch (error) {
     next(error);
   }
