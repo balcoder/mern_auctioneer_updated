@@ -91,8 +91,8 @@ export default function Listing() {
               </SwiperSlide>
             ))}
           </Swiper>
-          <div className=" fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer">
-            <div className="group relative inline-block">
+          <div className="group  fixed top-[13%] right-[3%] z-10 border rounded-full w-12 h-12 flex justify-center items-center bg-slate-100 cursor-pointer">
+            <div className="relative inline-block">
               <FaShare
                 className=" text-slate-500"
                 onClick={() => {
