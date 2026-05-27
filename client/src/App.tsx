@@ -4,6 +4,7 @@ import About from "./pages/About";
 import SignUp from "./pages/SignUp";
 import SignOut from "./pages/SignOut";
 import SignIn from "./pages/SignIn";
+import Search from "./pages/Search";
 import Profile from "./pages/Profile";
 import Header from "./assets/components/Header";
 import type { JSX } from "react";
@@ -22,6 +23,7 @@ export default function App(): JSX.Element {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/signout" element={<SignOut />} />
+        <Route path="/search" element={<Search />} />
         <Route path="/listing/:listingId" element={<Listing />} />
 
         <Route element={<PrivateRoute />}>
