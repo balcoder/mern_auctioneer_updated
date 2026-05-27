@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
-import Contact from "./Contact";
+import Contact from "../assets/Contact";
 import { Swiper, SwiperSlide } from "swiper/react";
 // import { SwiperCore } from "swiper";
 import { Navigation, Pagination } from "swiper/modules";
