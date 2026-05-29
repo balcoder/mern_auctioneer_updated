@@ -1,4 +1,4 @@
-import { useEffect, useState, type JSX } from "react";
+import { useEffect, useState, startTransition, type JSX } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { FaSearch } from "react-icons/fa";
 import { useSelector } from "react-redux";
@@ -7,35 +7,52 @@ import type { RootState } from "../../redux/store.ts";
 export default function Header(): JSX.Element {
   const { currentUser } = useSelector((state: RootState) => state.user);
   const [searchTerm, setSearchTerm] = useState("");
-
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // add live search
+  const navigate = useNavigate();
+
+  // Listen to URL changes and update input box
   useEffect(() => {
+    const searchTermFromUrl = searchParams.get("searchTerm") || "";
+    // Wrap the state update to prevent cascading renders
+    startTransition(() => {
+      setSearchTerm(searchTermFromUrl);
+    });
+  }, [searchParams]); // Fires whenever URL query strings change
+
+  // live debounce search
+  useEffect(() => {
+    // If the URL already matches the input, do nothing
+    if (searchTerm === (searchParams.get("searchTerm") || "")) return;
+
     const timer = setTimeout(() => {
-      const params = new URLSearchParams(searchParams);
-      params.set("searchTerm", searchTerm.trim());
-      setSearchParams(params, { replace: true });
-    }, 600); // debounce
+      // Functional update protects against race conditions
+      setSearchParams(
+        (prev) => {
+          if (searchTerm.trim()) {
+            prev.set("searchTerm", searchTerm.trim());
+          } else {
+            prev.delete("searchTerm");
+          }
+          return prev;
+        },
+        { replace: true },
+      );
+    }, 600);
 
     return () => clearTimeout(timer);
-  }, [searchTerm, searchParams, setSearchParams]);
+  }, [searchTerm, setSearchParams]);
 
-  // Handle search
   const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault();
-    // keep previous searchterms while changing the search input
     const params = new URLSearchParams(searchParams);
     if (searchTerm.trim()) {
       params.set("searchTerm", searchTerm.trim());
     } else {
       params.delete("searchTerm");
     }
-
     navigate(`/search?${params.toString()}`);
   };
-
   return (
     <header className="bg-slate-200 shadow-md">
       <div className="flex justify-between items-center max-w-6xl mx-auto p-3">
