@@ -1,5 +1,7 @@
 import { useEffect, useState, startTransition } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import ListingCard from "../assets/components/ListingCard";
+import type { Listing } from "./Listing";
 
 export default function Search() {
   const [sideBarData, setSideBarData] = useState({
@@ -12,11 +14,9 @@ export default function Search() {
     order: "desc",
   });
   const [loading, setLoading] = useState(false);
-  const [listing, setListings] = useState([]);
+  const [listing, setListings] = useState<Listing[]>([]);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-
-  console.log(listing);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
@@ -196,8 +196,24 @@ export default function Search() {
           </button>
         </form>
       </div>
-      <div className="text-3xl font-semibold text-slate-700 border-b border-gray-300 p-3 mt-5 w-full">
-        <h1>Listing Results:</h1>
+      <div className="flex-1">
+        <h1 className="text-3xl font-semibold text-slate-700 border-b border-gray-300 p-3 mt-5 w-full">
+          Listing Results:
+        </h1>
+        <div className="p-7 flex flex-wrap gap-4">
+          {!loading && !listing && (
+            <p className="text-2xl font-semibold  text-slate-700">
+              {" "}
+              No Listing found!
+            </p>
+          )}
+          {loading && <p className="text-center">Loading...</p>}
+          {!loading &&
+            listing &&
+            listing.map((singleListing) => (
+              <ListingCard key={singleListing._id} listing={singleListing} />
+            ))}
+        </div>
       </div>
     </div>
   );

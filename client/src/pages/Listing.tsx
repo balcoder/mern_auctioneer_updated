@@ -30,6 +30,7 @@ export interface Listing {
   parking: boolean;
   furnished: boolean;
   userRef: string;
+  _id: string;
 }
 
 export default function Listing() {
@@ -135,7 +136,7 @@ export default function Listing() {
                   {(
                     +listing.regularPrice - +listing.discountPrice
                   ).toLocaleString("en-US")}{" "}
-                  OFF
+                  Discount
                 </p>
               )}
             </div>
