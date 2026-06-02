@@ -15,8 +15,11 @@ export default function Search() {
   });
   const [loading, setLoading] = useState(false);
   const [listing, setListings] = useState<Listing[]>([]);
+  const [showMore, setShowMore] = useState(false);
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+
+  console.log(listing);
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
@@ -43,9 +46,16 @@ export default function Search() {
     });
     const fetchListing = async () => {
       setLoading(true);
+      setShowMore(false);
       const searchQuery = params.toString();
       const res = await fetch(`/api/listing/get?${searchQuery}`);
       const data = await res.json();
+      //pagination
+      if (data.length > 8) {
+        setShowMore(true);
+      } else {
+        setShowMore(false);
+      }
       setListings(data);
       setLoading(false);
     };
@@ -92,6 +102,36 @@ export default function Search() {
     urlParams.set("order", sideBarData.order);
     const searchQuery = urlParams.toString();
     navigate(`/search?${searchQuery}`);
+  };
+
+  const onShowMoreClick = async () => {
+    const startIndex = listing.length;
+
+    //Create a fresh copy of url
+    const urlParams = new URLSearchParams(searchParams);
+    // pass startIndex to url query so api controller can skip this num
+    // of records and return the rest
+    urlParams.set("startIndex", startIndex.toString());
+
+    const searchQuery = urlParams.toString();
+    console.log(searchQuery);
+
+    try {
+      const res = await fetch(`/api/listing/get?${searchQuery}`);
+      const data: Listing[] = await res.json();
+
+      // If data is less than 9 there are no more
+      if (data.length < 9) {
+        setShowMore(false);
+      } else {
+        setShowMore(true); // Keep visible if a full batch of 9 is returned
+      }
+
+      // Append new records to your existing listings array
+      setListings((prevListings) => [...prevListings, ...data]);
+    } catch (error) {
+      console.error("Failed to fetch more listings:", error);
+    }
   };
   return (
     <div className="flex flex-col sm:flex-row min-w-screen">
@@ -213,6 +253,15 @@ export default function Search() {
             listing.map((singleListing) => (
               <ListingCard key={singleListing._id} listing={singleListing} />
             ))}
+
+          {showMore && (
+            <button
+              className="text-green-700 hover:underline p-7 text-center w-full"
+              onClick={onShowMoreClick}
+            >
+              Show more
+            </button>
+          )}
         </div>
       </div>
     </div>
