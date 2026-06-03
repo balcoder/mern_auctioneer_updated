@@ -19,8 +19,6 @@ export default function Search() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  console.log(listing);
-
   useEffect(() => {
     const params = new URLSearchParams(searchParams);
     const searchTermFromUrl = params.get("searchTerm") || "";
