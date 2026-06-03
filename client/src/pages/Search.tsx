@@ -234,6 +234,8 @@ export default function Search() {
           </button>
         </form>
       </div>
+
+      {/* Listing results */}
       <div className="flex-1">
         <h1 className="text-3xl font-semibold text-slate-700 border-b border-gray-300 p-3 mt-5 w-full">
           Listing Results:
