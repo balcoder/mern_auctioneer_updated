@@ -140,7 +140,7 @@ export default function Search() {
               Search Term:
             </label>
             <input
-              className="bg-white rounded-lg p-3 w-full border border-gray-300 sm:max-w-[300px]"
+              className="bg-white rounded-lg p-3 w-full border border-gray-300 sm:max-w-75"
               type="text"
               id="searchTerm"
               placeholder="Search...."
