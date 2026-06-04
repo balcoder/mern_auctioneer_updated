@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import type { Listing } from "./Listing";
+import type { Listing } from "../pages/Listing";
 import { Link } from "react-router-dom";
 // import { landLordUser } from "./Profile";
 
@@ -7,13 +7,18 @@ interface ContactProps {
   listing: Listing;
 }
 
-interface Landlord {}
+interface Landlord {
+  username: string;
+  email: string;
+  avatar: string;
+  _id: string;
+}
 
 export default function Contact({ listing }: ContactProps) {
-  const [landlord, setLandlord] = useState(null);
+  const [landlord, setLandlord] = useState<Landlord | null>(null);
   const [message, setMessage] = useState("");
 
-  const onChange = (e) => {
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setMessage(e.target.value);
     console.log(message);
   };
@@ -44,7 +49,7 @@ export default function Contact({ listing }: ContactProps) {
           <textarea
             name="message"
             id="message"
-            rows="2"
+            rows={2}
             value={message}
             placeholder="Write your message here..."
             className="w-full border border-slate-400 p-3 bg-white"

@@ -4,21 +4,26 @@ import OAuth from "../assets/components/OAuth";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
+    const { id, value } = e.target;
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
+    setFormData((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
   };
-  const handleSubmit = async (e) => {
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setLoading(true);
+      setError(null);
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
@@ -39,7 +44,10 @@ export default function SignUp() {
       console.log(data);
     } catch (error) {
       setLoading(false);
-      setError(error.message);
+      const errorMessage =
+        error instanceof Error ? error.message : "An unexpected error occurred";
+
+      setError(errorMessage);
     }
   };
 

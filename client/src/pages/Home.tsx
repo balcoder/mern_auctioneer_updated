@@ -10,7 +10,6 @@ export default function Home() {
   const [offerListings, setOfferListings] = useState<Listing[] | []>([]);
   const [saleListings, setSaleListings] = useState<Listing[] | []>([]);
   const [rentListings, setRentListings] = useState<Listing[] | []>([]);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const fetchOfferListing = async () => {
@@ -20,7 +19,11 @@ export default function Home() {
         setOfferListings(data);
         fetchRentListing();
       } catch (error) {
-        console.log("Problem fetching listing offers", error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Problem fetching listing offers";
+        console.log(errorMessage);
       }
     };
     const fetchSaleListing = async () => {
@@ -29,7 +32,11 @@ export default function Home() {
         const data = await res.json();
         setSaleListings(data);
       } catch (error) {
-        console.log("Problem fetching listing sales", error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Problem fetching listing sales";
+        console.log(errorMessage);
       }
     };
     const fetchRentListing = async () => {
@@ -39,7 +46,11 @@ export default function Home() {
         setRentListings(data);
         fetchSaleListing();
       } catch (error) {
-        console.log("Problem fetching listing rents", error);
+        const errorMessage =
+          error instanceof Error
+            ? error.message
+            : "Problem fetching listing rents";
+        console.log(errorMessage);
       }
     };
     fetchOfferListing();
