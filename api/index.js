@@ -6,13 +6,17 @@ import authRouter from "./routes/auth.route.js";
 import listingRouter from "./routes/listing.route.js";
 import cookieParser from "cookie-parser";
 import path from "path";
-
-// For node v.24 on windows to connect to MongoDB
-import dns from "node:dns/promises"; // 1. Import the promises version of DNS
-// Explicitly force Node v24 to look up records using Cloudflare and Google
-dns.setServers(["1.1.1.1", "8.8.8.8"]);
+import dns from "node:dns/promises";
 
 dotenv.config();
+console.log(process.env.NODE_ENV);
+
+// For node v.24 on windows to connect to MongoDB
+if (process.env.NODE_ENV !== "production") {
+  // Explicitly force Node v24 to look up records using Cloudflare and Google
+  dns.setServers(["1.1.1.1", "8.8.8.8"]);
+}
+
 const __dirname = path.resolve();
 
 // connect to our mongo database
