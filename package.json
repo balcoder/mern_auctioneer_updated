@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "cross-env NODE_ENV=development  nodemon api/index.js",
-    "start": "cross-env NODE_ENV=production  node api/index.js",
+    "start": "node api/index.js",
     "build": "npm install --prefix client && npm run build --prefix client "
   },
   "repository": {
